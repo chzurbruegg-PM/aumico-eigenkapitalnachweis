@@ -5,3 +5,7 @@ dist-ssr
 .DS_Store
 .vite
 .claude/settings.local.json
+
+# TS build cache
+tsconfig.tsbuildinfo
+*.tsbuildinfo
