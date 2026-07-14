@@ -42,6 +42,7 @@ export default function Eigenkapitalnachweis() {
   const [rowDrag, setRowDrag] = useState<{ pid: string; rid: string } | null>(null);
   const [rowDropIdx, setRowDropIdx] = useState<number | null>(null); // insertion index in that period's rows
   const [menuCol, setMenuCol] = useState<{ id: string; x: number; y: number } | null>(null);
+  const [addMenu, setAddMenu] = useState<{ x: number; y: number } | null>(null); // "add column" chooser
   const liveDropIdx = useRef<number | null>(null); // latest insertion index during a drag
 
   // --- immutable update helper (deep clone, mutate, commit) ---
@@ -218,6 +219,22 @@ export default function Eigenkapitalnachweis() {
     };
   }, [menuCol]);
 
+  // close the "add column" chooser on any outside pointer-down / Escape
+  useEffect(() => {
+    if (!addMenu) return;
+    const onDown = (ev: PointerEvent) => {
+      const t = ev.target as HTMLElement;
+      if (!t.closest(".ek-menu") && !t.closest(".ek-addcol")) setAddMenu(null);
+    };
+    const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && setAddMenu(null);
+    window.addEventListener("pointerdown", onDown);
+    window.addEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("pointerdown", onDown);
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [addMenu]);
+
   // Column header (thead) — rendered fresh inside each year's own table so
   // every Geschäftsjahr-container is self-contained and column-aligned.
   const renderColHeader = () => (
@@ -345,11 +362,14 @@ export default function Eigenkapitalnachweis() {
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flex: "none" }}>
-            <button className="ek-btn" onClick={addCol}>
-              + Neue Spalte
-            </button>
-            <button className="ek-btn" onClick={addTotalCol}>
-              + Total-Spalte
+            <button
+              className="ek-btn ek-addcol"
+              onClick={(e) => {
+                const r = (e.currentTarget as HTMLElement).getBoundingClientRect();
+                setAddMenu((m) => (m ? null : { x: r.right - 232, y: r.bottom + 6 }));
+              }}
+            >
+              + Neue Spalte <span style={{ fontSize: 9, opacity: 0.85 }}>▾</span>
             </button>
           </div>
         </div>
@@ -500,6 +520,32 @@ export default function Eigenkapitalnachweis() {
           }}
         >
           Löschen
+        </button>
+      </div>
+    )}
+
+    {addMenu && (
+      <div className="ek-menu" style={{ top: addMenu.y, left: Math.max(8, addMenu.x), minWidth: 232 }}>
+        <div className="ek-menu-label">Spaltentyp wählen</div>
+        <button
+          className="ek-menu-item ek-menu-item-desc"
+          onClick={() => {
+            addCol();
+            setAddMenu(null);
+          }}
+        >
+          Wertspalte
+          <span className="ek-menu-hint">Position mit erfassbaren Werten</span>
+        </button>
+        <button
+          className="ek-menu-item ek-menu-item-desc"
+          onClick={() => {
+            addTotalCol();
+            setAddMenu(null);
+          }}
+        >
+          Total-Spalte
+          <span className="ek-menu-hint">Summe ausgewählter Wertspalten</span>
         </button>
       </div>
     )}
