@@ -118,71 +118,7 @@ Kontenzuordnung ändere, damit Anfangs-/Schlussbestand nie veraltet sind.
 
 ---
 
-## 4. Datenmodell — logisch
-
-Logische Sicht, kein DB-Schema.
-
-### Eigenkapitalnachweis (je Mandant + Geschäftsjahr)
-
-| Feld | Typ | Constraints | Quelle |
-|---|---|---|---|
-| id | `UUID` | Pflicht | `System` |
-| mandantId | `UUID` | Pflicht, FK | `Bestehendes Modul (Mandant)` |
-| geschaeftsjahrId | `UUID` | Pflicht, FK | `Bestehendes Modul (Buchungsperiode)` |
-| waehrung | `TEXT` (ISO 4217) | Default `CHF` | `Bestehendes Modul (Abschluss)` |
-| einheit | `CHF` | v1: volle CHF-Beträge, Tausendertrennzeichen (Apostroph), **immer 2 Nachkommastellen**. Keine TCHF-Darstellung. | `Fix (v1)` |
-| einleitungHtml | `TEXT` | optional, formatiert | `User-Input` |
-| anmerkungHtml | `TEXT` | optional, formatiert | `User-Input` |
-| status | `ENUM(Entwurf)` | v1 immer `Entwurf` | `System` |
-| version | `INTEGER` | Optimistic Locking | `System` |
-
-### Spalte
-
-| Feld | Typ | Constraints | Quelle |
-|---|---|---|---|
-| id | `UUID` | Pflicht | `System` |
-| titel | `TEXT` | Pflicht | `Berechnung (system)` / `User-Input` |
-| typ | `ENUM(system_wert · manuell_wert · total)` | Pflicht | `System` / `User-Input` |
-| kontogruppe | `TEXT` | nur `system_wert` | `Kontenzuordnung` |
-| sortIndex | `INTEGER` | Pflicht | `User-Input` |
-| totalQuellen | `ARRAY<UUID>` | nur `total` | `User-Input` (gewählte Wertspalten) |
-| loeschbar | `BOOLEAN` | COMPUTED: `system_wert` → false | `System` — „Systemberechnet, nicht editierbar" |
-
-### Periode (zwei je Nachweis: Vorjahr, laufendes Jahr)
-
-| Feld | Typ | Constraints | Quelle |
-|---|---|---|---|
-| id | `UUID` | Pflicht | `System` |
-| jahr | `TEXT` | Pflicht | `Buchungsperiode` |
-| istVorjahr | `BOOLEAN` | Pflicht | `System` |
-| openLabel / closeLabel | `TEXT` | COMPUTED (Bilanzstichtag) | `Buchungsperiode` |
-| sysOpen[spalte] | `DECIMAL(20,2)` | COMPUTED, read-only | `Kontenzuordnung` (Eröffnungssaldo) |
-| sysClose[spalte] | `DECIMAL(20,2)` | COMPUTED, read-only | `Kontenzuordnung` (Saldo per Bilanzstichtag) |
-| manOpen[spalte] | `DECIMAL(20,2)` | nur `manuell_wert` | `User-Input` |
-
-### Bewegungszeile & -wert
-
-| Feld | Typ | Constraints | Quelle |
-|---|---|---|---|
-| zeile.id | `UUID` | Pflicht | `System` |
-| zeile.periodeId | `UUID` | Pflicht, FK | `System` |
-| zeile.titel | `TEXT` | optional | `User-Input` |
-| zeile.sortIndex | `INTEGER` | Pflicht | `User-Input` |
-| bewegung.betrag | `DECIMAL(20,2)` | je (Zeile × Wertspalte) | `User-Input` |
-
-### Systemberechnet (COMPUTED, nicht editierbar)
-
-| Feld | Berechnung |
-|---|---|
-| anfangsbestand[periode][spalte] | `system_wert` → `sysOpen`; `manuell_wert` → `manOpen`; laufendes Jahr = `schlussbestand[Vorjahr]` (Rollforward) |
-| schlussbestandBerechnet[periode][spalte] | `anfangsbestand + Σ Bewegungen` |
-| total[periode][totalSpalte] | `Σ Wert der in totalQuellen gewählten Wertspalten` |
-| differenz[periode][system_wert] | `sysClose − schlussbestandBerechnet` |
-| abgestimmt[periode][system_wert] | `|differenz| < 0.005 CHF` |
-
----
-
-## 5. Acceptance Criteria
+## 4. Acceptance Criteria
 
 ```
 AC-01 [Zielwerte read-only aus Mapping]
@@ -216,9 +152,9 @@ AC-03 [Abstimmung exakt]
 
 ```
 AC-04 [Rollforward Vorjahr → laufendes Jahr]
-✓ Gegeben: Schlussbestand 2024 „Anteilscheinkapital" = 1'505.
+✓ Gegeben: Schlussbestand 2024 „Anteilscheinkapital" = 1'505'000.00.
 ✓ Wenn:    Das laufende Jahr 2025 wird angezeigt.
-✓ Dann:    Anfangsbestand 2025 „Anteilscheinkapital" = 1'505 (systemseitig fortgeschrieben,
+✓ Dann:    Anfangsbestand 2025 „Anteilscheinkapital" = 1'505'000.00 (systemseitig fortgeschrieben,
            nicht editierbar).
 ⚠ Edge:    Erstjahr ohne Vorjahr → siehe OF-2.
 ```
@@ -322,7 +258,7 @@ AC-14 [Auto-Aktualisierung aus der Kontenzuordnung]
 
 ---
 
-## 6. OR-Compliance
+## 5. OR-Compliance
 
 | OR-Artikel | Anforderung | Verbindlichkeit |
 |---|---|---|
@@ -335,7 +271,7 @@ Features.
 
 ---
 
-## 7. Haftungscheck
+## 6. Haftungscheck
 
 *Nicht anwendbar für v1.* Das Feature ist reine Bearbeitungs-UI im Entwurfsmodus. Es erzeugt
 keinen finalen Output (kein PDF, kein Sign-Off, keine Versiegelung, keine Revision). Die
@@ -350,7 +286,7 @@ fachliche Verantwortung für die Werte liegt beim Treuhänder.
 
 ---
 
-## 8. Prototyp-Abweichungen
+## 7. Prototyp-Abweichungen
 
 **Gilt NICHT für v1** (im Prototyp bzw. Umfeld sichtbar, aber bewusst ausgeschlossen):
 - PDF-/Druck-/Report-Ansicht und Sign-Off.
@@ -376,7 +312,7 @@ Design ist nie pixelgenau — Layout und Funktion sind verbindlich, umgesetzt mi
 
 ---
 
-## 9. Offene Fragen
+## 8. Offene Fragen
 
 | ID | Frage | Owner | Fällig bis | Status |
 |---|---|---|---|---|
