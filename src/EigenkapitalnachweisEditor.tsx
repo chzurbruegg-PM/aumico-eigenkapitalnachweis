@@ -50,6 +50,8 @@ export default function Eigenkapitalnachweis() {
     | null
   >(null);
   const liveDropIdx = useRef<number | null>(null); // latest insertion index during a drag
+  // floating preview chip that follows the cursor while dragging (like CDK/dnd-kit)
+  const [dragGhost, setDragGhost] = useState<{ x: number; y: number; label: string } | null>(null);
 
   // --- immutable update helper (deep clone, mutate, commit) ---
   const update = (fn: (d: EkData) => void) =>
@@ -147,6 +149,7 @@ export default function Eigenkapitalnachweis() {
     liveDropIdx.current = fromIdx;
     setColDrag(cols[fromIdx].id);
     setColDropIdx(fromIdx);
+    setDragGhost({ x: e.clientX, y: e.clientY, label: cols[fromIdx].title });
     const move = (ev: PointerEvent) => {
       const list = cellsOf();
       let ins = list.length;
@@ -159,6 +162,7 @@ export default function Eigenkapitalnachweis() {
       }
       liveDropIdx.current = ins;
       setColDropIdx(ins);
+      setDragGhost((g) => (g ? { ...g, x: ev.clientX, y: ev.clientY } : g));
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
@@ -168,6 +172,7 @@ export default function Eigenkapitalnachweis() {
       liveDropIdx.current = null;
       setColDrag(null);
       setColDropIdx(null);
+      setDragGhost(null);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
@@ -183,6 +188,9 @@ export default function Eigenkapitalnachweis() {
     liveDropIdx.current = fromIdx;
     setRowDrag({ pid, rid });
     setRowDropIdx(fromIdx);
+    const rowLabel =
+      data.periods.find((p) => p.id === pid)?.rows[fromIdx]?.title?.trim() || "Bewegung";
+    setDragGhost({ x: e.clientX, y: e.clientY, label: rowLabel });
     const move = (ev: PointerEvent) => {
       const list = rowsOf();
       let ins = list.length;
@@ -195,6 +203,7 @@ export default function Eigenkapitalnachweis() {
       }
       liveDropIdx.current = ins;
       setRowDropIdx(ins);
+      setDragGhost((g) => (g ? { ...g, x: ev.clientX, y: ev.clientY } : g));
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
@@ -204,6 +213,7 @@ export default function Eigenkapitalnachweis() {
       liveDropIdx.current = null;
       setRowDrag(null);
       setRowDropIdx(null);
+      setDragGhost(null);
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
@@ -609,6 +619,13 @@ export default function Eigenkapitalnachweis() {
             </button>
           </div>
         </div>
+      </div>
+    )}
+
+    {dragGhost && (
+      <div className="ek-drag-ghost" style={{ top: dragGhost.y + 16, left: dragGhost.x + 16 }}>
+        <span className="ek-drag-ghost-grip">⣿</span>
+        <span className="ek-drag-ghost-label">{dragGhost.label || "—"}</span>
       </div>
     )}
     </>

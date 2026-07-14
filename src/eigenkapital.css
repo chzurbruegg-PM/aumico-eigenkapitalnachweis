@@ -233,6 +233,36 @@
   flex: none;
 }
 
+/* floating drag preview chip (follows the cursor) */
+.ek-drag-ghost {
+  position: fixed;
+  z-index: 2500;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 280px;
+  padding: 7px 12px;
+  background: #fff;
+  border: 1px solid var(--ek-accent);
+  border-radius: 8px;
+  box-shadow: 0 8px 22px rgba(15, 163, 168, 0.28);
+  pointer-events: none;
+  transform: rotate(-1.5deg);
+}
+.ek-drag-ghost-grip {
+  color: var(--ek-accent);
+  font-size: 14px;
+  letter-spacing: -2px;
+  flex: none;
+}
+.ek-drag-ghost-label {
+  font: 600 12px/1.2 "Inter", sans-serif;
+  color: #1e2a30;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* delete-confirmation modal */
 .ek-modal-overlay {
   position: fixed;
