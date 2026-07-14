@@ -43,6 +43,12 @@ export default function Eigenkapitalnachweis() {
   const [rowDropIdx, setRowDropIdx] = useState<number | null>(null); // insertion index in that period's rows
   const [menuCol, setMenuCol] = useState<{ id: string; x: number; y: number } | null>(null);
   const [addMenu, setAddMenu] = useState<{ x: number; y: number } | null>(null); // "add column" chooser
+  // pending destructive action awaiting confirmation in the modal
+  const [confirm, setConfirm] = useState<
+    | { kind: "col"; id: string; label: string }
+    | { kind: "row"; pid: string; rid: string; label: string }
+    | null
+  >(null);
   const liveDropIdx = useRef<number | null>(null); // latest insertion index during a drag
 
   // --- immutable update helper (deep clone, mutate, commit) ---
@@ -234,6 +240,32 @@ export default function Eigenkapitalnachweis() {
       window.removeEventListener("keydown", onKey);
     };
   }, [addMenu]);
+
+  // Escape cancels the delete confirmation
+  useEffect(() => {
+    if (!confirm) return;
+    const onKey = (ev: KeyboardEvent) => ev.key === "Escape" && setConfirm(null);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [confirm]);
+
+  // Route destructive actions through the confirmation modal instead of deleting
+  // immediately.
+  const requestDeleteCol = (cid: string) => {
+    const c = data.cols.find((c) => c.id === cid);
+    setMenuCol(null);
+    setConfirm({ kind: "col", id: cid, label: c?.title?.trim() || "Spalte ohne Titel" });
+  };
+  const requestDeleteRow = (pid: string, rid: string) => {
+    const r = data.periods.find((p) => p.id === pid)?.rows.find((r) => r.id === rid);
+    setConfirm({ kind: "row", pid, rid, label: r?.title?.trim() || "Zeile ohne Titel" });
+  };
+  const confirmDelete = () => {
+    if (!confirm) return;
+    if (confirm.kind === "col") removeCol(confirm.id);
+    else removeRow(confirm.pid, confirm.rid);
+    setConfirm(null);
+  };
 
   // Column header (thead) — rendered fresh inside each year's own table so
   // every Geschäftsjahr-container is self-contained and column-aligned.
@@ -432,7 +464,7 @@ export default function Eigenkapitalnachweis() {
                     onCellInput={(rid, cid, v) => setCell(p.id, rid, cid, v)}
                     onManOpen={(cid, v) => setManOpen(p.id, cid, v)}
                     onRowTitle={(rid, v) => setRowTitle(p.id, rid, v)}
-                    onRemoveRow={(rid) => removeRow(p.id, rid)}
+                    onRemoveRow={(rid) => requestDeleteRow(p.id, rid)}
                     onRowPointerDown={(e, fromIdx, rid) => startRowDrag(e, p.id, fromIdx, rid)}
                     rowDropIdx={rowDrag && rowDrag.pid === p.id ? rowDropIdx : null}
                     dragRowId={rowDrag && rowDrag.pid === p.id ? rowDrag.rid : null}
@@ -515,8 +547,7 @@ export default function Eigenkapitalnachweis() {
           title={menuRemovable ? undefined : "Kommt aus dem Kontenmapping – nicht löschbar"}
           onClick={() => {
             if (!menuRemovable) return;
-            removeCol(menuCol.id);
-            setMenuCol(null);
+            requestDeleteCol(menuCol.id);
           }}
         >
           Löschen
@@ -547,6 +578,37 @@ export default function Eigenkapitalnachweis() {
           Total-Spalte
           <span className="ek-menu-hint">Summe ausgewählter Wertspalten</span>
         </button>
+      </div>
+    )}
+
+    {confirm && (
+      <div className="ek-modal-overlay" onPointerDown={() => setConfirm(null)}>
+        <div
+          className="ek-modal"
+          role="dialog"
+          aria-modal="true"
+          onPointerDown={(e) => e.stopPropagation()}
+        >
+          <div className="ek-modal-title">
+            {confirm.kind === "col" ? "Spalte löschen" : "Zeile löschen"}
+          </div>
+          <div className="ek-modal-text">
+            {confirm.kind === "col" ? "Die Spalte " : "Die Zeile "}
+            <b>„{confirm.label}"</b>
+            {confirm.kind === "col"
+              ? " und alle darin erfassten Werte werden gelöscht. "
+              : " wird gelöscht. "}
+            Diese Aktion kann nicht rückgängig gemacht werden.
+          </div>
+          <div className="ek-modal-actions">
+            <button className="ek-btn-ghost" onClick={() => setConfirm(null)} autoFocus>
+              Abbrechen
+            </button>
+            <button className="ek-btn-danger" onClick={confirmDelete}>
+              Löschen
+            </button>
+          </div>
+        </div>
       </div>
     )}
     </>
