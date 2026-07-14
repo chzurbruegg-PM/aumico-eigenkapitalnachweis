@@ -400,7 +400,7 @@ export default function Eigenkapitalnachweis() {
             <div
               style={{ marginTop: 5, font: "500 12px/1 'Inter',sans-serif", color: "#7a8891" }}
             >
-              in TCHF
+              in CHF
             </div>
           </div>
           <div style={{ display: "flex", gap: 8, flex: "none" }}>

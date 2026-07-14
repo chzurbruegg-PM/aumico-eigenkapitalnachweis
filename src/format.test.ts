@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import { fmt, pn, fmtInput, isNumeric } from "./format";
 
 describe("fmt", () => {
-  it("groups thousands with apostrophes", () => expect(fmt(1234567)).toBe("1'234'567"));
-  it("uses the unicode minus for negatives", () => expect(fmt(-250)).toBe("−250"));
+  it("groups thousands with apostrophes and 2 decimals", () => expect(fmt(1234567)).toBe("1'234'567.00"));
+  it("uses the unicode minus for negatives", () => expect(fmt(-250)).toBe("−250.00"));
   it("renders a dash for null/NaN", () => {
     expect(fmt(null)).toBe("–");
     expect(fmt(undefined)).toBe("–");
@@ -11,9 +11,12 @@ describe("fmt", () => {
   });
   it("renders a dash for ~0 when dashZero", () => {
     expect(fmt(0, true)).toBe("–");
-    expect(fmt(0)).toBe("0");
+    expect(fmt(0)).toBe("0.00");
   });
-  it("keeps two decimals for non-integers", () => expect(fmt(1234.5)).toBe("1'234.50"));
+  it("always shows two decimals", () => {
+    expect(fmt(1234.5)).toBe("1'234.50");
+    expect(fmt(1489000)).toBe("1'489'000.00");
+  });
 });
 
 describe("pn", () => {
@@ -43,8 +46,11 @@ describe("isNumeric", () => {
 });
 
 describe("fmtInput", () => {
-  it("groups and keeps an ASCII minus", () => expect(fmtInput("-1234")).toBe("-1'234"));
-  it("keeps decimals as typed", () => expect(fmtInput("1234.5")).toBe("1'234.5"));
+  it("groups, ASCII minus, always 2 decimals", () => expect(fmtInput("-1234")).toBe("-1'234.00"));
+  it("pads/rounds to 2 decimals", () => {
+    expect(fmtInput("1234.5")).toBe("1'234.50");
+    expect(fmtInput("16000")).toBe("16'000.00");
+  });
   it("returns empty for empty / lone minus", () => {
     expect(fmtInput("")).toBe("");
     expect(fmtInput("-")).toBe("");

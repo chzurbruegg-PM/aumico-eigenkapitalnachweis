@@ -11,7 +11,7 @@ export function fmt(n: number | null | undefined, dashZero = false): string {
   if (dashZero && Math.abs(n) < 0.005) return DASH;
   const neg = n < -0.005;
   const a = Math.abs(n);
-  const s = Number.isInteger(a) ? String(a) : a.toFixed(2);
+  const s = a.toFixed(2); // immer 2 Nachkommastellen (CHF, Rappen)
   const parts = s.split(".");
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, "'");
   return (neg ? MINUS : "") + parts.join(".");
@@ -45,7 +45,8 @@ export function fmtInput(raw: string): string {
   const neg = c.startsWith("-");
   const abs = neg ? c.slice(1) : c;
   if (!/^\d*\.?\d+$/.test(abs)) return raw;
-  const [i = "0", f] = abs.split(".");
+  const fixed = (parseFloat(abs) || 0).toFixed(2); // immer 2 Nachkommastellen
+  const [i, f] = fixed.split(".");
   const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
-  return (neg ? "-" : "") + grouped + (f !== undefined ? "." + f : "");
+  return (neg ? "-" : "") + grouped + "." + f;
 }
