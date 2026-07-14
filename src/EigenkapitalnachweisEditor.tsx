@@ -373,6 +373,14 @@ export default function Eigenkapitalnachweis() {
 
   return (
     <>
+    <div style={{ margin: "0 0 14px" }}>
+      <RichTextBlock
+        label="Einleitung"
+        placeholder="Einleitenden Text vor dem Eigenkapitalnachweis erfassen …"
+        addLabel="Einleitung hinzufügen"
+        initialHtml={EINLEITUNG_HTML}
+      />
+    </div>
     <div
       className="ek-card"
       style={{
@@ -414,15 +422,6 @@ export default function Eigenkapitalnachweis() {
               + Neue Spalte <span style={{ fontSize: 9, opacity: 0.85 }}>▾</span>
             </button>
           </div>
-        </div>
-
-        <div style={{ margin: "6px 12px 10px" }}>
-          <RichTextBlock
-            label="Einleitung"
-            placeholder="Einleitenden Text vor dem Eigenkapitalnachweis erfassen …"
-            addLabel="Einleitung hinzufügen"
-            initialHtml={EINLEITUNG_HTML}
-          />
         </div>
 
         {data.periods.map((p) => (
@@ -486,15 +485,15 @@ export default function Eigenkapitalnachweis() {
             </div>
           </div>
         ))}
+    </div>
 
-        <div style={{ margin: "10px 12px 12px" }}>
-          <RichTextBlock
-            label="Anmerkungen"
-            placeholder="Anmerkungen nach dem Eigenkapitalnachweis erfassen …"
-            addLabel="Anmerkung hinzufügen"
-            initialHtml={ANMERKUNGEN_HTML}
-          />
-        </div>
+    <div style={{ margin: "14px 0 0" }}>
+      <RichTextBlock
+        label="Anmerkungen"
+        placeholder="Anmerkungen nach dem Eigenkapitalnachweis erfassen …"
+        addLabel="Anmerkung hinzufügen"
+        initialHtml={ANMERKUNGEN_HTML}
+      />
     </div>
 
     {menuCol && menuTarget && (
