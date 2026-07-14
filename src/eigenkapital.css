@@ -1,0 +1,423 @@
+/* EK-Nachweis feature card styles — ported from Eigenkapitalnachweis.dc.html
+   <style> block. Global/body + design-doc chrome removed for embedding: the
+   shell's base.css owns body, box-sizing and links. Scoped under .ek-card so
+   the Inter type of the card never leaks into the Source-Sans-3 app shell. */
+
+.ek-card {
+  font-family: "Inter", "system-ui", sans-serif;
+  color: #1e2a30;
+}
+.ek-card input {
+  font-family: "Inter", "system-ui", sans-serif;
+}
+
+/* rich-text block (Einleitung / Anmerkungen) — progressive disclosure */
+.ek-add-text {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed #cfd8dd;
+  background: transparent;
+  color: #5a6870;
+  border-radius: 8px;
+  padding: 7px 12px;
+  font: 600 12px/1 "Inter", sans-serif;
+  cursor: pointer;
+  transition: border-color 0.12s, color 0.12s, background 0.12s;
+}
+.ek-add-text:hover {
+  border-color: #0fa3a8;
+  color: #0b7f84;
+  background: #f2fbfb;
+}
+.ek-rt {
+  border: 1px solid #e2e6e9;
+  border-radius: 10px;
+  background: #fff;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.ek-rt.active {
+  border-color: #0fa3a8;
+  box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
+}
+.ek-rt-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 10px 0 12px;
+}
+.ek-rt-tag {
+  font: 600 9px/1 "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9aa5ac;
+}
+.ek-rt-toolbar {
+  display: flex;
+  gap: 2px;
+  margin-left: auto;
+}
+.ek-rt-btn {
+  width: 26px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 5px;
+  color: #46555e;
+  font: 600 12px/1 "Inter", sans-serif;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+}
+.ek-rt-btn:hover {
+  background: #e9fafa;
+  border-color: #cdeff0;
+  color: #0b7f84;
+}
+.ek-rt-area {
+  padding: 6px 12px 12px;
+  font: 400 12.5px/1.7 "Inter", sans-serif;
+  color: #46555e;
+  outline: none;
+  min-height: 26px;
+}
+.ek-rt-area:empty::before {
+  content: attr(data-placeholder);
+  color: #aab4bb;
+}
+.ek-rt-area ul,
+.ek-rt-area ol {
+  margin: 4px 0;
+  padding-left: 22px;
+}
+
+/* column drag & drop: insertion indicator + grab affordance */
+.ek-dropline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #0fa3a8;
+  border-radius: 1px;
+  pointer-events: none;
+  z-index: 2;
+}
+.ek-colhead .ek-drag {
+  padding: 0 2px;
+  border-radius: 4px;
+  transition: background 0.12s, color 0.12s;
+}
+.ek-colhead:hover .ek-drag {
+  color: #0b7f84;
+  background: #e9fafa;
+}
+
+/* row drop indicator (horizontal teal line via inset shadow on the cells) */
+.ek-tr-mov[data-drop-before] > td,
+.ek-tr-sub[data-drop-before] > td {
+  box-shadow: inset 0 2px 0 0 #0fa3a8;
+}
+.ek-tr-mov[data-drop-end] > td,
+.ek-tr-sub[data-drop-end] > td {
+  box-shadow: inset 0 -2px 0 0 #0fa3a8;
+}
+
+/* column ⋮ kebab + dropdown menu */
+.ek-kebab {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #9aa5ac;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+}
+.ek-kebab:hover {
+  background: #eef1f3;
+  color: #46555e;
+  border-color: #dde2e6;
+}
+.ek-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 168px;
+  background: #fff;
+  border: 1px solid #e2e6e9;
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(20, 40, 50, 0.14);
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ek-menu-item {
+  text-align: left;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px 10px;
+  font: 500 12.5px/1.2 "Inter", sans-serif;
+  color: #1e2a30;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ek-menu-item:hover:not(:disabled) {
+  background: #f2f5f6;
+}
+.ek-menu-item:disabled {
+  color: #b4bdc4;
+  cursor: not-allowed;
+}
+.ek-menu-item.danger {
+  color: #d64545;
+}
+.ek-menu-item.danger:hover:not(:disabled) {
+  background: #fdeded;
+}
+.ek-menu-sep {
+  height: 1px;
+  background: #eef1f3;
+  margin: 4px 2px;
+}
+
+/* --- inputs --- */
+.ek-in {
+  width: 100%;
+  border: 1px solid #dde2e6;
+  background: #fff;
+  border-radius: 7px;
+  padding: 6px 9px;
+  font: 500 12.5px/1 "Inter", sans-serif;
+  color: #1e2a30;
+  outline: none;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.ek-in:focus {
+  border-color: #0fa3a8;
+  box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
+}
+.ek-in::placeholder {
+  color: #aab4bb;
+}
+.ek-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.ek-title-in {
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 6px;
+  padding: 6px 9px;
+  font: 500 13px/1.2 "Inter", sans-serif;
+  color: #1e2a30;
+  width: 100%;
+  flex: 1;
+  min-width: 0;
+  outline: none;
+  transition: border-color 0.12s, background 0.12s;
+}
+.ek-title-in:hover {
+  background: #f2f5f6;
+}
+.ek-title-in:focus {
+  border-color: #0fa3a8;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
+}
+.ek-colin {
+  border: 1px solid #0fa3a8;
+  background: #fff;
+  border-radius: 6px;
+  padding: 6px 8px;
+  font: 700 11px/1.35 "Inter Tight", sans-serif;
+  color: #3f4d54;
+  width: 260px;
+  flex: none;
+  outline: none;
+  text-align: left;
+  white-space: normal;
+  box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
+}
+
+/* --- buttons --- */
+.ek-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #0fa3a8;
+  background: #0fa3a8;
+  color: #fff;
+  border-radius: 9px;
+  padding: 8px 13px;
+  font: 600 12.5px/1 "Inter", sans-serif;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.ek-btn:hover {
+  background: #0b8b90;
+  border-color: #0b8b90;
+}
+.ek-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #d7dde1;
+  background: #fff;
+  color: #5a6870;
+  border-radius: 9px;
+  padding: 8px 12px;
+  font: 600 12.5px/1 "Inter", sans-serif;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+.ek-btn-ghost:hover {
+  border-color: #0fa3a8;
+  color: #0b7f84;
+}
+.ek-x {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1px solid #dde2e6;
+  background: #fff;
+  color: #9aa5ac;
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  transition: all 0.12s;
+  flex: none;
+}
+.ek-x:hover {
+  border-color: #e06666;
+  color: #e06666;
+  background: #fdeded;
+}
+.ek-drag {
+  cursor: grab;
+  color: #9aa5ac;
+  font-size: 15px;
+  user-select: none;
+  letter-spacing: -2px;
+  flex: none;
+}
+.ek-drag:active {
+  cursor: grabbing;
+}
+.ek-pencil {
+  border: none;
+  background: transparent;
+  color: #b4bdc4;
+  cursor: pointer;
+  font-size: 12px;
+  padding: 2px 4px;
+  border-radius: 5px;
+  line-height: 1;
+  transition: color 0.12s, background 0.12s;
+  flex: none;
+}
+.ek-pencil:hover {
+  color: #0b7f84;
+  background: #e9fafa;
+}
+.ek-colhead {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 3px;
+}
+.ek-colhead .ek-pencil {
+  opacity: 0;
+  transition: opacity 0.12s;
+}
+.ek-colhead:hover .ek-pencil {
+  opacity: 1;
+}
+
+/* --- row kinds --- */
+.ek-tr-open > td {
+  background: #f4f6f7;
+  border-top: 1px solid #e2e6e9;
+}
+.ek-tr-close > td {
+  background: #f4f6f7;
+  border-top: 1px solid #d7dde1;
+}
+.ek-tr-diff > td {
+  background: #fffdf6;
+  border-top: 1px dashed #e6d9b8;
+  border-bottom: 1px dashed #e6d9b8;
+}
+.ek-tr-mov > td {
+  border-bottom: 1px solid #f0f3f4;
+}
+.ek-tr-sub > td {
+  border-top: 1px solid #e2e6e9;
+  border-bottom: 1px solid #eef1f3;
+  background: #fbfcfc;
+}
+.ek-tr-spacer > td {
+  height: 22px;
+  border: none;
+  background: transparent;
+}
+
+/* --- inline editable prose (Einleitung / Anmerkungen) --- */
+.ek-prose-wrap {
+  position: relative;
+}
+.ek-prose {
+  padding: 12px 24px;
+  font: 400 12.5px/1.75 "Inter", sans-serif;
+  color: #46555e;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  outline: none;
+  transition: background 0.12s, border-color 0.12s, box-shadow 0.12s;
+}
+.ek-prose:hover {
+  background: #f7f9fa;
+}
+.ek-prose:focus {
+  background: #fff;
+  border-color: #0fa3a8;
+  box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
+}
+.ek-prose:empty::before {
+  content: attr(data-placeholder);
+  color: #aab4bb;
+}
+.ek-prose-tag {
+  position: absolute;
+  top: -9px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  background: #fff;
+  border: 1px solid #e2e6e9;
+  border-radius: 20px;
+  font: 600 9px/1 "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9aa5ac;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.12s;
+}
+.ek-prose-wrap:hover .ek-prose-tag,
+.ek-prose-wrap:focus-within .ek-prose-tag {
+  opacity: 1;
+}

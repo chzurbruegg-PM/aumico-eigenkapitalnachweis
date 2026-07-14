@@ -1,0 +1,292 @@
+/* ============================================================
+   Aumico Design System · Colors & Type
+   Source: Aumico Platform 2026.fig (Figma)
+   Core stack: Inter (UI), tokens based on Flowbite + Tailwind gray
+   ============================================================ */
+
+/* -------- Font faces -------- */
+/* Source Sans 3 — local TTFs in fonts/ (SIL OFL, brand-provided).
+   Covers 300/400/500/600/700/900 + matching italics. */
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 300; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Light.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 300; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-LightIt.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 400; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Regular.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 400; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-It.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 500; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Medium.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 500; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-MediumIt.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 600; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Semibold.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 600; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-SemiboldIt.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 700; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Bold.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 700; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-BoldIt.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: normal; font-weight: 900; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-Black.ttf") format("truetype"); }
+@font-face { font-family: "Source Sans 3"; font-style: italic; font-weight: 900; font-display: swap;
+  src: url("../assets/fonts/SourceSans3-BlackIt.ttf") format("truetype"); }
+
+:root {
+  /* ──────────────────────────────────────────────────────────
+     COLORS — TEAL (PRIMARY / BRAND)
+     The "aumico teal" from the logo gradient and CTAs.
+     ────────────────────────────────────────────────────────── */
+  --teal-50:  #ecfffe;  /* rgb(236,255,254) — cover bg, tinted surfaces */
+  --teal-100: #cffafe;
+  --teal-200: #a5f3fc;
+  --teal-300: #67e8f9;
+  --teal-400: #03a5b7;  /* rgb(3,165,183) — hover / accent */
+  --teal-500: #0a8394;  /* rgb(10,131,148) — PRIMARY · default button bg */
+  --teal-600: #126978;  /* rgb(18,105,120) — primary hover / dark borders */
+  --teal-700: #145765;  /* rgb(20,87,101) — pressed / dark variant */
+  --teal-800: #145a70;  /* rgb(20,90,112) — gradient stop (login) */
+  --teal-900: #256c5b;  /* rgb(37,108,91) — gradient start (login) */
+
+  /* ──────────────────────────────────────────────────────────
+     COLORS — NEUTRALS (Tailwind/Flowbite gray)
+     The workhorse of the product. 62k+ uses in Figma.
+     ────────────────────────────────────────────────────────── */
+  --gray-50:  #f9fafb;  /* surface / zebra-row / input bg */
+  --gray-100: #f3f4f6;  /* muted surface / placeholder */
+  --gray-200: #e5e7eb;  /* DEFAULT border — used ~62k × */
+  --gray-300: #d1d5db;  /* input border */
+  --gray-400: #9ca3af;  /* disabled text, faint icon */
+  --gray-500: #6b7280;  /* secondary text, icons */
+  --gray-600: #4b5563;  /* body text on light */
+  --gray-700: #374151;  /* headings / strong label */
+  --gray-800: #1f2a37;  /* alternative-button text, dark surfaces */
+  --gray-900: #111928;  /* PRIMARY TEXT COLOR */
+  --ink:      #221c26;  /* rgb(34,28,38) — dark display surface (Cover/Credentials only, NOT the product sidebar) */
+
+  /* ──────────────────────────────────────────────────────────
+     COLORS — SEMANTIC (status badges, alerts)
+     Pulled directly from Figma badge/status components.
+     ────────────────────────────────────────────────────────── */
+  --success-bg:    #def7ec;  /* rgb(222,247,236) — completed badge */
+  --success-border:#bcf0da;  /* badge border */
+  --success-fg:    #03543f;
+  --success-700:   #057a55;
+
+  --warning-bg:    #fdf6b2;  /* rgb(253,246,178) — in-progress badge */
+  --warning-fg:    #723b13;
+  --warning-700:   #c27803;
+
+  --danger-bg:     #fde8e8;  /* rgb(253,232,232) */
+  --danger-border: #f8b4b4;
+  --danger-fg:     #9b1c1c;
+  --danger-500:    #e02424;  /* rgb(224,36,36) */
+
+  --info-bg:       #e5edff;  /* rgb(229,237,255) */
+  --info-fg:       #1e429f;
+  --info-500:      #3f83f8;
+
+  --purple-bg:     #edebfe;  /* rgb(237,235,254) */
+  --purple-fg:     #5521b5;
+
+  --pink-bg:       #fce8f3;  /* rgb(252,232,243) */
+  --pink-fg:       #99154b;
+
+  /* ──────────────────────────────────────────────────────────
+     SEMANTIC ALIASES — use these in components
+     ────────────────────────────────────────────────────────── */
+  --fg-default:    var(--gray-900);
+  --fg-muted:      var(--gray-500);
+  --fg-subtle:     var(--gray-400);
+  --fg-strong:     var(--gray-900);
+  --fg-on-primary: #ffffff;
+  --fg-on-dark:    #ffffff;
+
+  --bg-canvas:     #ffffff;
+  --bg-surface:    #ffffff;
+  --bg-muted:      var(--gray-50);
+  --bg-subtle:     var(--gray-100);
+  --bg-sidebar:    #ffffff;
+
+  --border-default: var(--gray-200);
+  --border-strong:  var(--gray-300);
+  --border-subtle:  var(--gray-100);
+
+  --accent:        var(--teal-500);
+  --accent-hover:  var(--teal-600);
+  --accent-pressed:var(--teal-700);
+
+  --focus-ring:    0 0 0 4px rgba(10, 131, 148, 0.25);
+
+  /* Login / marketing gradient */
+  --brand-gradient: linear-gradient(180deg, #256c5b 0%, #145a70 100%);
+
+  /* ──────────────────────────────────────────────────────────
+     TYPOGRAPHY
+     Source Sans Pro / Source Sans 3 is the primary face (~1,973 usages
+     in the Figma). Inter appears only in the Admin-Dashboard area.
+     Sizes follow the Flowbite / Tailwind scale.
+     ────────────────────────────────────────────────────────── */
+  --font-sans: "Source Sans 3", "Source Sans Pro", ui-sans-serif, system-ui,
+               -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo,
+               "Source Code Pro", monospace;
+
+  /* Type scale */
+  --text-xs:   12px;
+  --text-sm:   14px;   /* body default — the most-used size in the product */
+  --text-base: 16px;
+  --text-lg:   18px;
+  --text-xl:   20px;
+  --text-2xl:  24px;
+  --text-3xl:  30px;
+  --text-4xl:  36px;
+  --text-5xl:  48px;
+  --text-6xl:  60px;
+
+  /* Weights */
+  --weight-regular: 400;
+  --weight-medium:  500;   /* most common — 37k × */
+  --weight-semibold:600;
+  --weight-bold:    700;
+
+  /* Line heights */
+  --leading-tight:  1.25;
+  --leading-snug:   1.375;
+  --leading-normal: 1.5;   /* default */
+  --leading-relaxed:1.625;
+
+  /* ──────────────────────────────────────────────────────────
+     SPACING · RADII · ELEVATION
+     ────────────────────────────────────────────────────────── */
+  --space-0:  0;
+  --space-1:  4px;
+  --space-2:  8px;
+  --space-3:  12px;
+  --space-4:  16px;
+  --space-5:  20px;
+  --space-6:  24px;
+  --space-8:  32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  --radius-sm:   4px;
+  --radius-md:   6px;   /* badges */
+  --radius-lg:   8px;   /* buttons, inputs */
+  --radius-xl:  12px;
+  --radius-2xl: 16px;   /* panels */
+  --radius-3xl: 24px;
+  --radius-full: 9999px;
+
+  /* Soft, functional shadows — Flowbite-style, understated */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05), 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  /* Motion */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-enter:    cubic-bezier(0, 0, 0.2, 1);
+  --ease-exit:     cubic-bezier(0.4, 0, 1, 1);
+  --dur-fast: 120ms;
+  --dur-med:  180ms;
+  --dur-slow: 280ms;
+}
+
+/* ──────────────────────────────────────────────────────────
+   BASE TYPE ELEMENTS
+   ────────────────────────────────────────────────────────── */
+html, body {
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  color: var(--fg-default);
+  background: var(--bg-canvas);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, .h1 {
+  font-family: var(--font-sans);
+  font-weight: var(--weight-bold);
+  font-size: var(--text-4xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+  color: var(--fg-strong);
+  margin: 0;
+}
+h2, .h2 {
+  font-weight: var(--weight-bold);
+  font-size: var(--text-3xl);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.015em;
+  color: var(--fg-strong);
+  margin: 0;
+}
+h3, .h3 {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-2xl);
+  line-height: var(--leading-snug);
+  color: var(--fg-strong);
+  margin: 0;
+}
+h4, .h4 {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-xl);
+  line-height: var(--leading-snug);
+  color: var(--fg-strong);
+  margin: 0;
+}
+h5, .h5 {
+  font-weight: var(--weight-medium);
+  font-size: var(--text-lg);
+  line-height: var(--leading-normal);
+  color: var(--fg-strong);
+  margin: 0;
+}
+
+p, .body {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-regular);
+  line-height: var(--leading-normal);
+  color: var(--fg-default);
+  margin: 0;
+}
+.body-lg { font-size: var(--text-base); }
+.body-sm { font-size: var(--text-xs); color: var(--fg-muted); }
+
+.label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--fg-default);
+}
+.caption {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-regular);
+  color: var(--fg-muted);
+}
+.eyebrow {
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--fg-muted);
+}
+
+code, kbd, samp {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+
+::selection {
+  background: var(--teal-100);
+  color: var(--gray-900);
+}
