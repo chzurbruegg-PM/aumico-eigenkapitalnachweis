@@ -83,7 +83,8 @@ Schlussbestand des Vorjahres automatisch als Anfangsbestand des laufenden Jahres
 Als Treuhänder, möchte ich vor und nach der Tabelle Text erfassen, damit der Nachweis
 erläutert ist (z.B. ausgegebene Anteilscheine).
 ```
-- **UI-Kontext:** „Einleitung hinzufügen" über, „Anmerkung hinzufügen" unter der Tabelle.
+- **UI-Kontext:** Zwei eigenständige Blöcke **ausserhalb** des Nachweis-Containers —
+  „Einleitung" über der Karte, „Anmerkung" unter der Karte.
 - **Normalfall:** Editor erscheint nur bei Bedarf; einfache Formatierung (fett/kursiv/
   unterstrichen, Aufzählung/Nummerierung). Vorjahrestext wird als editierbare Vorlage
   übernommen.
