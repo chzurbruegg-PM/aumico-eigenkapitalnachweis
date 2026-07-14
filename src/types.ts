@@ -9,9 +9,12 @@ export interface Col {
    *  unless they are total columns. Added value columns are non-system. */
   system: boolean;
   type: ColType;
+  /** For `total` columns: the value-column ids this total sums. Absent = sum all
+   *  value columns. Configurable per total column (see the ⋮ menu). */
+  sources?: string[];
 }
 
-export type RowType = "movement" | "subtotal";
+export type RowType = "movement";
 
 export interface MovementRow {
   id: string;

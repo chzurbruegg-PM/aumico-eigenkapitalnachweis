@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Col, EkData, Period } from "./types";
-import { fmt, pn } from "./format";
+import { fmt, fmtInput, isNumeric, pn } from "./format";
+import { colOpen, isVal, near0, reinsert, sumForTotal } from "./calc";
 import { seed } from "./seed";
 import "./eigenkapital.css";
 
@@ -9,39 +10,25 @@ import "./eigenkapital.css";
 const EINLEITUNG_HTML = "";
 const ANMERKUNGEN_HTML = "";
 
-const isVal = (c: Col) => c.type !== "total";
-
-const colOpen = (p: Period, c: Col): number =>
-  c.system ? p.sysOpen[c.id] || 0 : pn(p.manOpen[c.id] || "");
-
-// Sum a per-value-col numeric over the value cols positioned before index `idx`.
-function sumBefore(cols: Col[], idx: number, getv: (c: Col) => number): number {
-  let s = 0;
-  for (let i = 0; i < idx; i++) {
-    const cc = cols[i];
-    if (isVal(cc)) s += getv(cc);
-  }
-  return s;
-}
-
-const near0 = (x: number) => Math.abs(x) < 0.005;
-
-// Column drag styling: tint the whole dragged column and draw a full-height
-// insertion line at the drop position — applied to the header cell AND every
-// body cell of a column so the highlight spans the entire table height.
-function colDnDStyle(
+// Per-column cell style, applied to the header cell AND every body cell:
+//  - total columns get a report-style grey band over the full height (#8)
+//  - during a column drag, the dragged column is tinted and a full-height
+//    insertion line is drawn at the drop position
+function cellStyle(
+  c: Col,
   idx: number,
-  colId: string,
   draggedId: string | null,
   dropIdx: number | null,
   colCount: number,
 ): React.CSSProperties {
-  if (!draggedId) return {};
   const s: React.CSSProperties = {};
-  if (colId === draggedId) s.background = "rgba(15,163,168,0.09)";
-  if (dropIdx != null) {
-    if (dropIdx === idx) s.boxShadow = "inset 2px 0 0 0 #0fa3a8";
-    else if (idx === colCount - 1 && dropIdx === colCount) s.boxShadow = "inset -2px 0 0 0 #0fa3a8";
+  if (c.type === "total") s.background = "#f3f5f6"; // greyed like the final report
+  if (draggedId) {
+    if (c.id === draggedId) s.background = "rgba(15,163,168,0.10)"; // dragged column wins
+    if (dropIdx != null) {
+      if (dropIdx === idx) s.boxShadow = "inset 2px 0 0 0 #0fa3a8";
+      else if (idx === colCount - 1 && dropIdx === colCount) s.boxShadow = "inset -2px 0 0 0 #0fa3a8";
+    }
   }
   return s;
 }
@@ -106,13 +93,26 @@ export default function Eigenkapitalnachweis() {
         type: "value",
       });
     });
+  const valColIds = (d: EkData) => d.cols.filter((c) => c.type !== "total").map((c) => c.id);
   const addTotalCol = () =>
     update((d) => {
-      d.cols.push({ id: "c" + d.uid++, title: "Total", system: true, type: "total" });
+      // A new total sums every current value column by default; configurable via ⋮.
+      d.cols.push({ id: "c" + d.uid++, title: "Total", system: true, type: "total", sources: valColIds(d) });
+    });
+  // Toggle whether a value column is part of a total column's sum.
+  const toggleTotalSource = (totalId: string, colId: string) =>
+    update((d) => {
+      const t = d.cols.find((c) => c.id === totalId);
+      if (!t) return;
+      const base = t.sources ?? valColIds(d);
+      t.sources = base.includes(colId) ? base.filter((x) => x !== colId) : [...base, colId];
     });
   const removeCol = (cid: string) =>
     update((d) => {
       d.cols = d.cols.filter((c) => c.id !== cid);
+      d.cols.forEach((c) => {
+        if (c.sources) c.sources = c.sources.filter((x) => x !== cid);
+      });
       d.periods.forEach((p) => {
         p.rows.forEach((r) => delete r.vals[cid]);
         delete p.manOpen[cid];
@@ -120,25 +120,12 @@ export default function Eigenkapitalnachweis() {
     });
   const moveRowByInsert = (pid: string, from: number, beforeIdx: number) =>
     update((d) => {
-      const rows = P(d, pid).rows;
-      if (from < 0 || from >= rows.length) return;
-      const [m] = rows.splice(from, 1);
-      let at = from < beforeIdx ? beforeIdx - 1 : beforeIdx;
-      if (at < 0) at = 0;
-      if (at > rows.length) at = rows.length;
-      rows.splice(at, 0, m);
+      const p = P(d, pid);
+      p.rows = reinsert(p.rows, from, beforeIdx);
     });
-  // Move column at `from` so it lands immediately before original index
-  // `beforeIdx` (beforeIdx === cols.length appends at the end). No-op when the
-  // column would keep its place.
   const moveColByInsert = (from: number, beforeIdx: number) =>
     update((d) => {
-      if (from < 0 || from >= d.cols.length) return;
-      const [m] = d.cols.splice(from, 1);
-      let insertAt = from < beforeIdx ? beforeIdx - 1 : beforeIdx;
-      if (insertAt < 0) insertAt = 0;
-      if (insertAt > d.cols.length) insertAt = d.cols.length;
-      d.cols.splice(insertAt, 0, m);
+      d.cols = reinsert(d.cols, from, beforeIdx);
     });
 
   const cols = data.cols;
@@ -262,7 +249,7 @@ export default function Eigenkapitalnachweis() {
                 minWidth: 132,
                 verticalAlign: "bottom",
                 position: "relative",
-                ...colDnDStyle(idx, c.id, colDrag, colDropIdx, cols.length),
+                ...cellStyle(c, idx, colDrag, colDropIdx, cols.length),
               }}
             >
               <div className="ek-colhead">
@@ -479,6 +466,28 @@ export default function Eigenkapitalnachweis() {
         >
           Nach rechts verschieben
         </button>
+        {menuTarget.type === "total" && (
+          <>
+            <div className="ek-menu-sep" />
+            <div className="ek-menu-label">Summiert diese Spalten</div>
+            {cols
+              .filter((vc) => vc.type !== "total")
+              .map((vc) => {
+                const srcs =
+                  menuTarget.sources ?? cols.filter((x) => x.type !== "total").map((x) => x.id);
+                return (
+                  <label className="ek-menu-check" key={vc.id}>
+                    <input
+                      type="checkbox"
+                      checked={srcs.includes(vc.id)}
+                      onChange={() => toggleTotalSource(menuTarget.id, vc.id)}
+                    />
+                    <span>{vc.title}</span>
+                  </label>
+                );
+              })}
+          </>
+        )}
         <div className="ek-menu-sep" />
         <button
           className="ek-menu-item danger"
@@ -601,7 +610,39 @@ function RichTextBlock({ label, placeholder, addLabel, initialHtml = "" }: RichT
   );
 }
 
-// --- one period's table body: opening, movements/subtotals, closing, diff ---
+// --- numeric amount input: formats on blur (apostrophe grouping, ASCII minus),
+// flags non-numeric input, and keeps the raw string round-trippable via pn(). ---
+function NumberInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
+  const [invalid, setInvalid] = useState(false);
+  return (
+    <input
+      className={"ek-in ek-num" + (invalid ? " ek-invalid" : "")}
+      value={value}
+      inputMode="decimal"
+      placeholder="–"
+      onChange={(e) => {
+        if (invalid) setInvalid(false);
+        onChange(e.target.value);
+      }}
+      onBlur={(e) => {
+        const raw = e.target.value;
+        if (raw.trim() === "") {
+          setInvalid(false);
+          return;
+        }
+        if (!isNumeric(raw)) {
+          setInvalid(true);
+          return;
+        }
+        setInvalid(false);
+        const f = fmtInput(raw);
+        if (f !== raw) onChange(f);
+      }}
+    />
+  );
+}
+
+// --- one period's table body: opening, movements, closing, diff ---
 interface PeriodBodyProps {
   p: Period;
   cols: Col[];
@@ -655,12 +696,6 @@ function PeriodBody({
     </span>
   );
 
-  // running accumulator for subtotals
-  const acc: Record<string, number> = {};
-  cols.forEach((c) => {
-    if (isVal(c)) acc[c.id] = 0;
-  });
-
   return (
     <>
       {/* opening */}
@@ -676,20 +711,17 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
             {c.type === "total"
-              ? numCell(fmt(sumBefore(cols, idx, (cc) => colOpen(p, cc))), "#0b7f84")
+              ? numCell(fmt(sumForTotal(c, cols, (cc) => colOpen(p, cc))), "#0b7f84")
               : c.system
                 ? numCell(fmt(p.sysOpen[c.id] || 0), "#3f4d54")
                 : (
-                    <input
-                      className="ek-in ek-num"
+                    <NumberInput
                       value={p.manOpen[c.id] || ""}
-                      onChange={(e) => onManOpen(c.id, e.target.value)}
-                      inputMode="decimal"
-                      placeholder="–"
+                      onChange={(v) => onManOpen(c.id, v)}
                     />
                   )}
           </td>
@@ -697,7 +729,7 @@ function PeriodBody({
         <td style={{ width: 40, padding: "5px 12px 5px 4px", textAlign: "center" }} />
       </tr>
 
-      {/* movement / subtotal rows */}
+      {/* movement rows */}
       {p.rows.map((r, ridx) => {
         const dropBefore = rowDropIdx === ridx;
         const dropEnd = ridx === p.rows.length - 1 && rowDropIdx === p.rows.length;
@@ -712,61 +744,6 @@ function PeriodBody({
           </span>
         );
 
-        if (r.type === "subtotal") {
-          const snap: Record<string, number> = {};
-          cols.forEach((c) => {
-            if (isVal(c)) snap[c.id] = acc[c.id];
-          });
-          cols.forEach((c) => {
-            if (isVal(c)) acc[c.id] = 0;
-          });
-          return (
-            <tr
-              key={r.id}
-              className="ek-tr-sub"
-              data-rowcell=""
-              data-drop-before={dropBefore ? "" : undefined}
-              data-drop-end={dropEnd ? "" : undefined}
-              style={dragRowId === r.id ? { opacity: 0.4 } : undefined}
-            >
-              <td style={{ padding: "8px 14px 8px 24px" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 6, width: "100%" }}>
-                  {rowGrip}
-                  <input
-                    className="ek-title-in"
-                    value={r.title}
-                    onChange={(e) => onRowTitle(r.id, e.target.value)}
-                    placeholder="Text eingeben"
-                  />
-                </div>
-              </td>
-              {cols.map((c, idx) => (
-                <td
-            key={c.id}
-            style={{
-              padding: "5px 12px",
-              textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
-            }}
-          >
-                  {c.type === "total"
-                    ? numCell(fmt(sumBefore(cols, idx, (cc) => snap[cc.id]), true), "#0b7f84")
-                    : numCell(fmt(snap[c.id], true), "#3f4d54")}
-                </td>
-              ))}
-              <td style={{ width: 40, padding: "5px 12px 5px 4px", textAlign: "center" }}>
-                <span className="ek-x" onClick={() => onRemoveRow(r.id)}>
-                  −
-                </span>
-              </td>
-            </tr>
-          );
-        }
-
-        // movement
-        cols.forEach((c) => {
-          if (isVal(c)) acc[c.id] += pn(r.vals[c.id]);
-        });
         return (
           <tr
             key={r.id}
@@ -793,18 +770,15 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
                 {c.type === "total" ? (
-                  numCell(fmt(sumBefore(cols, idx, (cc) => pn(r.vals[cc.id])), true), "#0b7f84")
+                  numCell(fmt(sumForTotal(c, cols, (cc) => pn(r.vals[cc.id])), true), "#0b7f84")
                 ) : (
-                  <input
-                    className="ek-in ek-num"
+                  <NumberInput
                     value={r.vals[c.id] || ""}
-                    onChange={(e) => onCellInput(r.id, c.id, e.target.value)}
-                    inputMode="decimal"
-                    placeholder="–"
+                    onChange={(v) => onCellInput(r.id, c.id, v)}
                   />
                 )}
               </td>
@@ -831,13 +805,13 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
             {c.type === "total"
               ? numCell(
                   fmt(
-                    sumBefore(cols, idx, (cc) =>
+                    sumForTotal(c, cols, (cc) =>
                       cc.system ? p.sysClose[cc.id] || 0 : computed[cc.id],
                     ),
                   ),
@@ -858,11 +832,7 @@ function PeriodBody({
         </td>
         {cols.map((c, idx) => {
           if (c.type === "total") {
-            let dv = 0;
-            for (let i = 0; i < idx; i++) {
-              const cc = cols[i];
-              if (isVal(cc) && cc.system) dv += diff[cc.id] as number;
-            }
+            const dv = sumForTotal(c, cols, (cc) => (cc.system ? (diff[cc.id] ?? 0) : 0));
             const ok = near0(dv);
             return (
               <td
@@ -870,7 +840,7 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
                 {numCell(ok ? "✓" : fmt(dv), ok ? "#15926B" : "#C77A18")}
@@ -884,7 +854,7 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
                 {numCell("–", "#B4BDC4")}
@@ -898,7 +868,7 @@ function PeriodBody({
             style={{
               padding: "5px 12px",
               textAlign: "right",
-              ...colDnDStyle(idx, c.id, colDragId, colDropIdx, cols.length),
+              ...cellStyle(c, idx, colDragId, colDropIdx, cols.length),
             }}
           >
               {numCell(ok ? "✓" : fmt(dv), ok ? "#15926B" : "#C77A18")}

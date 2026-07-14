@@ -3,6 +3,15 @@
    shell's base.css owns body, box-sizing and links. Scoped under .ek-card so
    the Inter type of the card never leaks into the Source-Sans-3 app shell. */
 
+/* Feature colour tokens. Defined on :root because the column ⋮ menu is rendered
+   outside .ek-card (position:fixed). Point --ek-accent at --teal-500 to adopt
+   the aumico design-system teal instead of the prototype's teal. */
+:root {
+  --ek-accent: #0fa3a8;
+  --ek-accent-strong: #0b7f84;
+  --ek-danger: #e02424;
+}
+
 .ek-card {
   font-family: "Inter", "system-ui", sans-serif;
   color: #1e2a30;
@@ -26,8 +35,8 @@
   transition: border-color 0.12s, color 0.12s, background 0.12s;
 }
 .ek-add-text:hover {
-  border-color: #0fa3a8;
-  color: #0b7f84;
+  border-color: var(--ek-accent);
+  color: var(--ek-accent-strong);
   background: #f2fbfb;
 }
 .ek-rt {
@@ -37,7 +46,7 @@
   transition: border-color 0.12s, box-shadow 0.12s;
 }
 .ek-rt.active {
-  border-color: #0fa3a8;
+  border-color: var(--ek-accent);
   box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
 }
 .ek-rt-head {
@@ -74,7 +83,7 @@
 .ek-rt-btn:hover {
   background: #e9fafa;
   border-color: #cdeff0;
-  color: #0b7f84;
+  color: var(--ek-accent-strong);
 }
 .ek-rt-area {
   padding: 6px 12px 12px;
@@ -99,7 +108,7 @@
   top: 0;
   bottom: 0;
   width: 2px;
-  background: #0fa3a8;
+  background: var(--ek-accent);
   border-radius: 1px;
   pointer-events: none;
   z-index: 2;
@@ -110,18 +119,18 @@
   transition: background 0.12s, color 0.12s;
 }
 .ek-colhead:hover .ek-drag {
-  color: #0b7f84;
+  color: var(--ek-accent-strong);
   background: #e9fafa;
 }
 
 /* row drop indicator (horizontal teal line via inset shadow on the cells) */
 .ek-tr-mov[data-drop-before] > td,
 .ek-tr-sub[data-drop-before] > td {
-  box-shadow: inset 0 2px 0 0 #0fa3a8;
+  box-shadow: inset 0 2px 0 0 var(--ek-accent);
 }
 .ek-tr-mov[data-drop-end] > td,
 .ek-tr-sub[data-drop-end] > td {
-  box-shadow: inset 0 -2px 0 0 #0fa3a8;
+  box-shadow: inset 0 -2px 0 0 var(--ek-accent);
 }
 
 /* column ⋮ kebab + dropdown menu */
@@ -188,6 +197,31 @@
   background: #eef1f3;
   margin: 4px 2px;
 }
+.ek-menu-label {
+  padding: 6px 10px 3px;
+  font: 600 9px/1 "Inter", sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #9aa5ac;
+}
+.ek-menu-check {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font: 500 12.5px/1.25 "Inter", sans-serif;
+  color: #1e2a30;
+  cursor: pointer;
+}
+.ek-menu-check:hover {
+  background: #f2f5f6;
+}
+.ek-menu-check input {
+  accent-color: var(--ek-accent);
+  cursor: pointer;
+  flex: none;
+}
 
 /* --- inputs --- */
 .ek-in {
@@ -202,11 +236,16 @@
   transition: border-color 0.12s, box-shadow 0.12s;
 }
 .ek-in:focus {
-  border-color: #0fa3a8;
+  border-color: var(--ek-accent);
   box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
 }
 .ek-in::placeholder {
   color: #aab4bb;
+}
+.ek-in.ek-invalid,
+.ek-in.ek-invalid:focus {
+  border-color: var(--ek-danger);
+  box-shadow: 0 0 0 3px rgba(224, 36, 36, 0.16);
 }
 .ek-num {
   text-align: right;
@@ -229,12 +268,12 @@
   background: #f2f5f6;
 }
 .ek-title-in:focus {
-  border-color: #0fa3a8;
+  border-color: var(--ek-accent);
   background: #fff;
   box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
 }
 .ek-colin {
-  border: 1px solid #0fa3a8;
+  border: 1px solid var(--ek-accent);
   background: #fff;
   border-radius: 6px;
   padding: 6px 8px;
@@ -253,8 +292,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  border: 1px solid #0fa3a8;
-  background: #0fa3a8;
+  border: 1px solid var(--ek-accent);
+  background: var(--ek-accent);
   color: #fff;
   border-radius: 9px;
   padding: 8px 13px;
@@ -280,8 +319,8 @@
   transition: background 0.12s, border-color 0.12s;
 }
 .ek-btn-ghost:hover {
-  border-color: #0fa3a8;
-  color: #0b7f84;
+  border-color: var(--ek-accent);
+  color: var(--ek-accent-strong);
 }
 .ek-x {
   display: inline-flex;
@@ -328,7 +367,7 @@
   flex: none;
 }
 .ek-pencil:hover {
-  color: #0b7f84;
+  color: var(--ek-accent-strong);
   background: #e9fafa;
 }
 .ek-colhead {
@@ -391,7 +430,7 @@
 }
 .ek-prose:focus {
   background: #fff;
-  border-color: #0fa3a8;
+  border-color: var(--ek-accent);
   box-shadow: 0 0 0 3px rgba(15, 163, 168, 0.14);
 }
 .ek-prose:empty::before {

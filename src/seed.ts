@@ -13,6 +13,7 @@ export function seed(): EkData {
         title: "Total Eigenkapital exkl. Minderheitsanteile",
         system: true,
         type: "total",
+        sources: ["c1", "c2", "c3"],
       },
       { id: "c4", title: "Minderheitsanteile", system: true, type: "value" },
       {
@@ -20,6 +21,7 @@ export function seed(): EkData {
         title: "Total Eigenkapital inkl. Minderheitsanteile",
         system: true,
         type: "total",
+        sources: ["c1", "c2", "c3", "c4"],
       },
     ],
     periods: [

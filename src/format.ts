@@ -17,10 +17,35 @@ export function fmt(n: number | null | undefined, dashZero = false): string {
   return (neg ? MINUS : "") + parts.join(".");
 }
 
-/** Parse a user-entered amount string into a number (apostrophes/spaces
- *  stripped, comma treated as decimal separator). Empty → 0. */
+/** Normalise a user-entered amount: strip apostrophes/spaces, map the unicode
+ *  minus (−) to ASCII, and comma → dot. */
+function normalizeAmount(s: string): string {
+  return String(s).replace(/['’\s]/g, "").replace(/−/g, "-").replace(",", ".");
+}
+
+/** Parse a user-entered amount string into a number. Empty/garbage → 0. */
 export function pn(s: string | null | undefined): number {
   if (s === "" || s === null || s === undefined) return 0;
-  const v = parseFloat(String(s).replace(/['’\s]/g, "").replace(",", "."));
+  const v = parseFloat(normalizeAmount(String(s)));
   return Number.isNaN(v) ? 0 : v;
+}
+
+/** True if a non-empty input parses to a finite number. */
+export function isNumeric(raw: string): boolean {
+  const c = normalizeAmount(raw.trim());
+  return c !== "" && c !== "-" && /^-?\d*\.?\d+$/.test(c);
+}
+
+/** Format a user-entered amount for display INSIDE an input: apostrophe
+ *  grouping with an ASCII "-" for negatives so `pn()` round-trips exactly.
+ *  Empty / "-" → "". Invalid input is returned unchanged. */
+export function fmtInput(raw: string): string {
+  const c = normalizeAmount(raw.trim());
+  if (c === "" || c === "-") return "";
+  const neg = c.startsWith("-");
+  const abs = neg ? c.slice(1) : c;
+  if (!/^\d*\.?\d+$/.test(abs)) return raw;
+  const [i = "0", f] = abs.split(".");
+  const grouped = i.replace(/\B(?=(\d{3})+(?!\d))/g, "'");
+  return (neg ? "-" : "") + grouped + (f !== undefined ? "." + f : "");
 }
