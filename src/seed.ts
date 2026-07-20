@@ -15,10 +15,10 @@ export function seed(): EkData {
         type: "total",
         sources: ["c1", "c2", "c3"],
       },
-      { id: "c4", title: "Minderheitsanteile", system: true, type: "value" },
+      { id: "c4", title: "Manuell hinzugefügte Spalte", system: true, type: "value" },
       {
         id: "ct2",
-        title: "Total Eigenkapital inkl. Minderheitsanteile",
+        title: "Neues Total",
         system: true,
         type: "total",
         sources: ["c1", "c2", "c3", "c4"],
