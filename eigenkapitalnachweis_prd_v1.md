@@ -11,7 +11,7 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.9 |
+| Version | 1.10 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
@@ -329,18 +329,3 @@ fachliche Verantwortung für die Werte liegt beim Treuhänder.
 
 Design ist nie pixelgenau — Layout und Funktion sind verbindlich, umgesetzt mit
 `aumico-components` wo möglich.
-
----
-
-## 8. Offene Fragen
-
-Alle Punkte geklärt (Stand v1.8). Keine offenen Fragen.
-
-| ID | Frage | Entscheidung | Status |
-|---|---|---|---|
-| OF-1 | Ableitung Kontogruppe → System-Spalte | 1:1 pro Eigenkapital-Kontogruppe; Name und Reihenfolge aus der Kontogruppe (rechtsformabhängig). Siehe Story 2. | Entschieden |
-| OF-2 | Erstjahr ohne Vorjahr: Anfangsbestand | Im Erstjahr manuell erfassbar (editierbar statt read-only); kein automatischer Rollforward. Siehe AC-04. | Entschieden |
-| OF-3 | Wegfall einer System-Spalte durch Mapping-Änderung | Mapping-Änderung erlaubt. Beim nächsten Öffnen des EK-Nachweises Info-Banner; Spalte inkl. Bewegungen wird erst nach Bestätigung gelöscht (E-EK-04). Siehe AC-14, AC-15. | Entschieden |
-| OF-4 | Konzern/Konsolidierung (Minderheitsanteile) | v1 = Einzelabschluss, datengetrieben. „Minderheitsanteile" nur wenn Kontogruppe existiert; keine Konsolidierungslogik. Siehe Prototyp-Abweichungen. | Entschieden |
-| OF-5 | Währung/Einheit | Immer volle CHF, 2 Nachkommastellen; keine TCHF-Option in v1. | Entschieden |
-| OF-6 | Audit-Trail | Kein Audit-Trail in v1; kommt mit dem Sign-Off-/Abschluss-Modul. | Entschieden |
