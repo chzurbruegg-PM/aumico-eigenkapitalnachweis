@@ -10,7 +10,7 @@ export function seed(): EkData {
       { id: "c3", title: "Gewinnreserven", system: true, type: "value" },
       {
         id: "ct1",
-        title: "Total Eigenkapital exkl. Minderheitsanteile",
+        title: "Total Eigenkapital",
         system: true,
         type: "total",
         sources: ["c1", "c2", "c3"],
