@@ -11,7 +11,7 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.7 |
+| Version | 1.8 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
@@ -61,8 +61,9 @@ Als Treuhänder, möchte ich Spalten ergänzen, umbenennen, sortieren und lösch
 Nachweis der Kapitalstruktur des Mandanten entspricht.
 ```
 - **UI-Kontext:** Spaltenkopf (Drag-Griff, ⋮-Menü) und Button „+ Neue Spalte" mit Typ-Auswahl.
-- **Normalfall:** System-Spalten stammen aus den Eigenkapital-Kontogruppen. Der User ergänzt
-  Wert- oder Total-Spalten und sortiert per Drag & Drop.
+- **Normalfall:** Je Eigenkapital-Kontogruppe entsteht automatisch genau eine System-Spalte
+  (1:1), benannt und geordnet nach der Kontogruppe. Der User ergänzt zusätzlich Wert- oder
+  Total-Spalten und sortiert per Drag & Drop.
 - **Fehlerfall:** Versuch, eine System-Spalte (aus dem Mapping) zu löschen → „Löschen" ist im
   ⋮-Menü deaktiviert, mit Hinweis „Kommt aus dem Kontenmapping – nicht löschbar".
 - **Edge-Case:** Total-Spalte summiert nur die vom User ausgewählten Wertspalten.
@@ -76,7 +77,8 @@ Schlussbestand des Vorjahres automatisch als Anfangsbestand des laufenden Jahres
 - **Normalfall:** Anfangsbestand laufendes Jahr = Schlussbestand Vorjahr. Bewegungen sind je
   Periode separat.
 - **Fehlerfall:** Vorjahr nicht abgestimmt → Warnung bleibt bestehen, blockiert aber nicht.
-- **Edge-Case:** Erstjahr ohne Vorjahr (siehe Offene Fragen OF-2).
+- **Edge-Case:** Erstjahr ohne Vorjahr → der Anfangsbestand wird manuell erfasst (kein
+  automatischer Rollforward).
 
 ### Story 4: Erläuternde Texte erfassen
 ```
@@ -111,9 +113,9 @@ Kontenzuordnung ändere, damit Anfangs-/Schlussbestand nie veraltet sind.
 - **UI-Kontext:** Tab „Eigenkapitalnachweis" (die grauen Zielwerte + Abstimm-Zeilen).
 - **Normalfall:** Ändert sich die Zuordnung von Eigenkapital-Konten/-Kontogruppen, übernimmt der
   Nachweis die neuen Anfangs-/Schlussbestände automatisch; die Abstimmung wird neu gerechnet.
-- **Fehlerfall:** Eine bisher zugeordnete EK-Kontogruppe wird entfernt → die zugehörige
-  System-Spalte verschwindet; bereits erfasste Bewegungen dieser Spalte werden markiert (siehe
-  Edge / OF-3).
+- **Fehlerfall:** Eine bisher zugeordnete EK-Kontogruppe wird entfernt (im Mapping erlaubt).
+  Beim nächsten Öffnen des EK-Nachweises informiert ein Banner darüber; die Spalte inkl.
+  Bewegungen wird erst nach Bestätigung gelöscht.
 - **Edge-Case:** Neue EK-Kontogruppe kommt dazu → neue System-Spalte erscheint, zunächst ohne
   Bewegungen, mit offener Differenz.
 
@@ -157,7 +159,8 @@ AC-04 [Rollforward Vorjahr → laufendes Jahr]
 ✓ Wenn:    Das laufende Jahr 2025 wird angezeigt.
 ✓ Dann:    Anfangsbestand 2025 „Anteilscheinkapital" = 1'505'000.00 (systemseitig fortgeschrieben,
            nicht editierbar).
-⚠ Edge:    Erstjahr ohne Vorjahr → siehe OF-2.
+⚠ Edge:    Erstjahr ohne Vorjahr in aumico → kein automatischer Anfangsbestand; der Treuhänder
+           erfasst den Anfangsbestand je Spalte manuell (editierbar statt read-only).
 ```
 
 ```
@@ -248,9 +251,10 @@ AC-14 [Auto-Aktualisierung aus der Kontenzuordnung]
            zugeordnet, oder ein Saldo-Re-Import ändert die Salden).
 ✓ Dann:    Anfangs-/Schlussbestand und die Abstimm-Zeilen aktualisieren sich automatisch —
            ohne dass der Treuhänder den EK-Nachweis manuell neu laden/anstossen muss.
-✗ Fehler:  Eine zugeordnete EK-Kontogruppe fällt weg → die System-Spalte verschwindet; auf ihr
-           erfasste Bewegungen werden markiert und dem Treuhänder gemeldet (E-EK-04), nicht
-           still gelöscht.
+✗ Fehler:  Eine zugeordnete EK-Kontogruppe fällt weg (die Mapping-Änderung ist erlaubt). Beim
+           nächsten Öffnen des EK-Nachweises erscheint ein Informationsbanner, der den Wegfall
+           kommuniziert. Die betroffene Spalte inkl. ihrer Bewegungen wird erst nach
+           Bestätigung durch den Treuhänder gelöscht (E-EK-04).
 ⚠ Edge:    Änderung macht eine zuvor abgestimmte Periode wieder unstimmig → Abstimm-Zeile
            wechselt automatisch von ✓ auf orangen Restbetrag.
 # Beispiel: Zielwert „Gewinnreserven" ändert sich durch Re-Import von 47'583'000.00 auf
@@ -280,8 +284,8 @@ fachliche Verantwortung für die Werte liegt beim Treuhänder.
 
 - **Output-Kennzeichnung:** Der Nachweis ist im Entwurfsmodus (`Entwurf`); ein „ENTWURF"-Label
   greift erst in der späteren Report-/PDF-Ansicht (nicht v1).
-- **Audit-Trail:** Änderungen an Bewegungen/Spalten/Texten sollten protokolliert werden
-  (wer/wann/welcher Stand) — als Vorbereitung auf den späteren Sign-Off.
+- **Audit-Trail:** Kein Audit-Trail in v1. Ein Änderungsprotokoll (wer/wann/welcher Stand)
+  kommt erst mit dem Sign-Off-/Abschluss-Modul.
 - **Hinweis:** Sobald PDF-Export oder Sign-Off ergänzt werden, wird der volle Haftungscheck
   Pflicht (siehe Critique).
 
@@ -297,6 +301,8 @@ fachliche Verantwortung für die Werte liegt beim Treuhänder.
 - Eigene Funktionalwährungs-Umrechnung im Eigenkapitalnachweis — Umrechnung ist vorgelagert.
 - Zwischentotal-Zeilen (im Prototyp bereits entfernt).
 - Auto-Save — v1 speichert nur auf expliziten Klick.
+- Konzern-/Konsolidierungslogik — v1 ist Einzelabschluss. „Minderheitsanteile" erscheinen nur,
+  wenn eine solche Kontogruppe existiert (datengetrieben), ohne eigene Konsolidierungsberechnung.
 
 **Abweichung von `aumico-components`:**
 - Der Prototyp nutzt eine eigene Teal-Farbe (`#0fa3a8`) und Schrift (Inter). Umsetzung mit den
@@ -315,11 +321,13 @@ Design ist nie pixelgenau — Layout und Funktion sind verbindlich, umgesetzt mi
 
 ## 8. Offene Fragen
 
-| ID | Frage | Owner | Fällig bis | Status |
-|---|---|---|---|---|
-| OF-1 | Welche Eigenkapital-Kontogruppen werden konkret zu welchen System-Spalten? (Ableitungsregel) | Chris / Engineering | vor Umsetzung | Offen |
-| OF-2 | Erstjahr ohne Vorjahr: Woher kommt der Anfangsbestand des laufenden Jahres? (manuell / Eröffnungsbilanz) | Chris | vor Umsetzung | Offen |
-| OF-3 | Auto-Aktualisierung bei Änderung der Kontenzuordnung ist **entschieden** (Zielwerte aktualisieren automatisch, AC-14). Offen bleibt nur: exakte Behandlung bereits erfasster Bewegungen, wenn eine System-Spalte durch Mapping-Änderung wegfällt (markieren vs. archivieren). | Engineering | vor Umsetzung | Teil-offen |
-| OF-4 | Konsolidierung: Gilt „Minderheitsanteile" nur für Konzernmandanten? Abgrenzung Einzel- vs. Konzernabschluss. | Chris | vor Umsetzung | Offen |
-| OF-5 | **Entschieden:** Anzeige immer in vollen CHF mit 2 Nachkommastellen (keine TCHF-Option in v1). | Chris | — | Erledigt |
-| OF-6 | Audit-Trail-Umfang bereits in v1 oder erst mit Sign-Off? | Chris / Engineering | vor Umsetzung | Offen |
+Alle Punkte geklärt (Stand v1.8). Keine offenen Fragen.
+
+| ID | Frage | Entscheidung | Status |
+|---|---|---|---|
+| OF-1 | Ableitung Kontogruppe → System-Spalte | 1:1 pro Eigenkapital-Kontogruppe; Name und Reihenfolge aus der Kontogruppe (rechtsformabhängig). Siehe Story 2. | Entschieden |
+| OF-2 | Erstjahr ohne Vorjahr: Anfangsbestand | Im Erstjahr manuell erfassbar (editierbar statt read-only); kein automatischer Rollforward. Siehe AC-04. | Entschieden |
+| OF-3 | Wegfall einer System-Spalte durch Mapping-Änderung | Mapping-Änderung erlaubt. Beim nächsten Öffnen des EK-Nachweises Info-Banner; Spalte inkl. Bewegungen wird erst nach Bestätigung gelöscht (E-EK-04). Siehe AC-14. | Entschieden |
+| OF-4 | Konzern/Konsolidierung (Minderheitsanteile) | v1 = Einzelabschluss, datengetrieben. „Minderheitsanteile" nur wenn Kontogruppe existiert; keine Konsolidierungslogik. Siehe Prototyp-Abweichungen. | Entschieden |
+| OF-5 | Währung/Einheit | Immer volle CHF, 2 Nachkommastellen; keine TCHF-Option in v1. | Entschieden |
+| OF-6 | Audit-Trail | Kein Audit-Trail in v1; kommt mit dem Sign-Off-/Abschluss-Modul. | Entschieden |
