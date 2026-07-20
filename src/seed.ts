@@ -5,8 +5,9 @@ export function seed(): EkData {
   return {
     uid: 30,
     cols: [
-      { id: "c1", title: "Anteilscheinkapital", system: true, type: "value" },
-      { id: "c2", title: "Zusatzanteilscheinkapital", system: true, type: "value" },
+      // System-Spalten aus den Eigenkapital-Kontogruppen der Saldobilanz — nicht löschbar.
+      { id: "c1", title: "Aktienkapital", system: true, type: "value" },
+      { id: "c2", title: "Freiwillige Gewinnreserven", system: true, type: "value" },
       { id: "c3", title: "Gewinnreserven", system: true, type: "value" },
       {
         id: "ct1",
@@ -15,11 +16,12 @@ export function seed(): EkData {
         type: "total",
         sources: ["c1", "c2", "c3"],
       },
-      { id: "c4", title: "Manuell hinzugefügte Spalte", system: true, type: "value" },
+      // Beispiel: manuell ergänzte Spalten (nicht aus dem Kontenmapping) — löschbar.
+      { id: "c4", title: "Manuell hinzugefügte Spalte", system: false, type: "value" },
       {
         id: "ct2",
         title: "Neues Total",
-        system: true,
+        system: false,
         type: "total",
         sources: ["c1", "c2", "c3", "c4"],
       },
@@ -30,9 +32,9 @@ export function seed(): EkData {
         year: "2024",
         openLabel: "Eigenkapital per 1. Januar 2024",
         closeLabel: "Eigenkapital per 31. Dezember 2024",
-        sysOpen: { c1: 1489000, c2: 5000000, c3: 40378000, c4: 119000 },
-        sysClose: { c1: 1505000, c2: 5000000, c3: 47583000, c4: 222000 },
-        manOpen: {},
+        sysOpen: { c1: 1489000, c2: 5000000, c3: 40378000 },
+        sysClose: { c1: 1505000, c2: 5000000, c3: 47583000 },
+        manOpen: { c4: "119'000.00" },
         rows: [
           { id: "a1", type: "movement", title: "Zunahme Anteilscheinkapital", vals: { c1: "16'000.00" } },
           {
@@ -54,9 +56,9 @@ export function seed(): EkData {
         year: "2025",
         openLabel: "Eigenkapital per 1. Januar 2025",
         closeLabel: "Eigenkapital per 31. Dezember 2025",
-        sysOpen: { c1: 1505000, c2: 5000000, c3: 47583000, c4: 222000 },
-        sysClose: { c1: 1510000, c2: 5182000, c3: 52912000, c4: 329000 },
-        manOpen: {},
+        sysOpen: { c1: 1505000, c2: 5000000, c3: 47583000 },
+        sysClose: { c1: 1510000, c2: 5182000, c3: 52912000 },
+        manOpen: { c4: "222'000.00" },
         rows: [
           {
             id: "b1",

@@ -106,7 +106,8 @@ export default function Eigenkapitalnachweis() {
   const addTotalCol = () =>
     update((d) => {
       // A new total sums every current value column by default; configurable via ⋮.
-      d.cols.push({ id: "c" + d.uid++, title: "Total", system: true, type: "total", sources: valColIds(d) });
+      // Manually added → system:false, so it stays deletable.
+      d.cols.push({ id: "c" + d.uid++, title: "Total", system: false, type: "total", sources: valColIds(d) });
     });
   // Toggle whether a value column is part of a total column's sum.
   const toggleTotalSource = (totalId: string, colId: string) =>
@@ -365,11 +366,9 @@ export default function Eigenkapitalnachweis() {
 
   const menuTarget = menuCol ? cols.find((c) => c.id === menuCol.id) : null;
   const menuIdx = menuCol ? cols.findIndex((c) => c.id === menuCol.id) : -1;
-  const menuRemovable = menuTarget
-    ? menuTarget.type === "total"
-      ? true
-      : !menuTarget.system
-    : false;
+  // Nur manuell ergänzte Spalten sind löschbar. System-Spalten (Kontogruppen aus
+  // der Saldobilanz) UND System-Total-Spalten bleiben bestehen.
+  const menuRemovable = menuTarget ? !menuTarget.system : false;
 
   return (
     <>
@@ -549,18 +548,14 @@ export default function Eigenkapitalnachweis() {
               })}
           </>
         )}
-        <div className="ek-menu-sep" />
-        <button
-          className="ek-menu-item danger"
-          disabled={!menuRemovable}
-          title={menuRemovable ? undefined : "Kommt aus dem Kontenmapping – nicht löschbar"}
-          onClick={() => {
-            if (!menuRemovable) return;
-            requestDeleteCol(menuCol.id);
-          }}
-        >
-          Löschen
-        </button>
+        {menuRemovable && (
+          <>
+            <div className="ek-menu-sep" />
+            <button className="ek-menu-item danger" onClick={() => requestDeleteCol(menuCol.id)}>
+              Löschen
+            </button>
+          </>
+        )}
       </div>
     )}
 
