@@ -11,7 +11,7 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.8 |
+| Version | 1.9 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
@@ -132,6 +132,8 @@ AC-01 [Zielwerte read-only aus Mapping]
 ✗ Fehler:  Keine Kontogruppe zugeordnet → Leerzustand (AC-10).
 ⚠ Edge:    Manuell ergänzte Wertspalte hat keinen Mapping-Zielwert → Anfangsbestand ist
            erfassbar, kein Schlussbestand-Ziel.
+⚠ Edge:    Erstjahr ohne Vorjahr → der Anfangsbestand ist editierbar (manuell erfasst), nicht
+           read-only aus dem Mapping.
 ```
 
 ```
@@ -261,6 +263,17 @@ AC-14 [Auto-Aktualisierung aus der Kontenzuordnung]
 #           47'600'000.00 → Differenz 17'000.00 erscheint automatisch, ohne Reload.
 ```
 
+```
+AC-15 [Info-Banner bei weggefallener Kontogruppe]
+✓ Gegeben: Eine EK-Kontogruppe wurde im Mapping entfernt; auf ihrer Spalte sind Bewegungen erfasst.
+✓ Wenn:    Der Treuhänder öffnet den EK-Nachweis erneut.
+✓ Dann:    Ein Informationsbanner meldet den Wegfall der Kontogruppe „X" und bietet an, die
+           Spalte inkl. ihrer Bewegungen zu löschen. Erst nach Bestätigung wird gelöscht (E-EK-04).
+✗ Fehler:  Ohne Bestätigung bleibt der Banner; Spalte und Bewegungen bleiben unverändert erhalten.
+⚠ Edge:    Kommt die Kontogruppe vor der Bestätigung zurück ins Mapping → Banner verschwindet,
+           die Spalte bleibt regulär bestehen.
+```
+
 ---
 
 ## 5. OR-Compliance
@@ -327,7 +340,7 @@ Alle Punkte geklärt (Stand v1.8). Keine offenen Fragen.
 |---|---|---|---|
 | OF-1 | Ableitung Kontogruppe → System-Spalte | 1:1 pro Eigenkapital-Kontogruppe; Name und Reihenfolge aus der Kontogruppe (rechtsformabhängig). Siehe Story 2. | Entschieden |
 | OF-2 | Erstjahr ohne Vorjahr: Anfangsbestand | Im Erstjahr manuell erfassbar (editierbar statt read-only); kein automatischer Rollforward. Siehe AC-04. | Entschieden |
-| OF-3 | Wegfall einer System-Spalte durch Mapping-Änderung | Mapping-Änderung erlaubt. Beim nächsten Öffnen des EK-Nachweises Info-Banner; Spalte inkl. Bewegungen wird erst nach Bestätigung gelöscht (E-EK-04). Siehe AC-14. | Entschieden |
+| OF-3 | Wegfall einer System-Spalte durch Mapping-Änderung | Mapping-Änderung erlaubt. Beim nächsten Öffnen des EK-Nachweises Info-Banner; Spalte inkl. Bewegungen wird erst nach Bestätigung gelöscht (E-EK-04). Siehe AC-14, AC-15. | Entschieden |
 | OF-4 | Konzern/Konsolidierung (Minderheitsanteile) | v1 = Einzelabschluss, datengetrieben. „Minderheitsanteile" nur wenn Kontogruppe existiert; keine Konsolidierungslogik. Siehe Prototyp-Abweichungen. | Entschieden |
 | OF-5 | Währung/Einheit | Immer volle CHF, 2 Nachkommastellen; keine TCHF-Option in v1. | Entschieden |
 | OF-6 | Audit-Trail | Kein Audit-Trail in v1; kommt mit dem Sign-Off-/Abschluss-Modul. | Entschieden |
