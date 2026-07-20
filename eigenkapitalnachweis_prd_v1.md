@@ -11,7 +11,7 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.10 |
+| Version | 1.11 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
@@ -276,20 +276,7 @@ AC-15 [Info-Banner bei weggefallener Kontogruppe]
 
 ---
 
-## 5. OR-Compliance
-
-| OR-Artikel | Anforderung | Verbindlichkeit |
-|---|---|---|
-| OR 959b | Mindestgliederung Passiven inkl. Eigenkapital-Positionen (Grund-/Aktien-/Stamm-/Anteilscheinkapital, Kapital- und Gewinnreserven, eigene Kapitalanteile, Bilanzgewinn/-verlust). Die System-Spalten müssen diese Gliederung abbilden. | Zwingend |
-| OR 959c | Anhang: Angaben zum Eigenkapital, eigene Anteile, wesentliche Ereignisse. Der Eigenkapitalnachweis dient als Grundlage der Anhang-Angaben. | Zwingend (Anhang) |
-| Tabellarische Eigenkapitalveränderungsrechnung | Für OR-only KMU nicht zwingend, aber gängige Praxis / Teil des erweiterten Anhangs. Zwingend nur unter anerkanntem Standard (z.B. FER) oder im Konzernabschluss. | Praxisreferenz |
-
-Kein FER/IAS-Verweis für OR-only KMU. Kapitalschutz (Art. 725a/725b) ist nicht Teil dieses
-Features.
-
----
-
-## 6. Haftungscheck
+## 5. Haftungscheck
 
 *Nicht anwendbar für v1.* Das Feature ist reine Bearbeitungs-UI im Entwurfsmodus. Es erzeugt
 keinen finalen Output (kein PDF, kein Sign-Off, keine Versiegelung, keine Revision). Die
@@ -304,7 +291,7 @@ fachliche Verantwortung für die Werte liegt beim Treuhänder.
 
 ---
 
-## 7. Prototyp-Abweichungen
+## 6. Prototyp-Abweichungen
 
 **Gilt NICHT für v1** (im Prototyp bzw. Umfeld sichtbar, aber bewusst ausgeschlossen):
 - PDF-/Druck-/Report-Ansicht und Sign-Off.
