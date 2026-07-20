@@ -11,7 +11,7 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.6 |
+| Version | 1.7 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
@@ -23,17 +23,19 @@
 ## 2. Problem Statement
 
 **Was ist das Problem?**
-Der Eigenkapitalnachweis wird in aumico heute schon angeboten — aber sehr starr und ohne
-Führung, mit schlechtem UI/UX. Der Treuhänder wird nicht durch die Erfassung geführt und kann
-die Struktur kaum anpassen.
+Der Eigenkapitalnachweis existiert in aumico bereits — als starres, ungeführtes Formular mit
+schwachem UI/UX. Es fehlt eine Führung durch die Erfassung, eine Kontroll-Abstimmung und die
+Anpassung an die Kapitalstruktur des Mandanten. Das kostet Zeit und ist fehleranfällig.
 
 **Was ist die Lösung?**
-Ein Redesign mit deutlich besserer UX und mehr Funktionalität. Anfangs- und Schlussbestand
-kommen automatisch aus dem Kontenmapping; der Treuhänder erfasst geführt nur die Bewegungen.
-Eine Abstimm-Zeile prüft je Position. Spalten und Zeilen sind editierbar und sortierbar.
+Ein Redesign, das aus dem starren Formular ein geführtes Werkzeug macht. Anfangs- und
+Schlussbestand kommen automatisch aus dem Kontenmapping. Der Treuhänder erfasst nur die
+Bewegungen — eine Abstimm-Zeile zeigt je Position sofort, ob alles aufgeht. Spalten und Zeilen
+lassen sich benennen, sortieren und ergänzen.
 
 **Warum jetzt?**
-Wir haben vermehrt Kundenanfragen erhalten, die genau diese Verbesserung wünschen.
+Kundenanfragen nach genau dieser Verbesserung häufen sich. Der Nachweis ist zudem fester Teil
+jedes Abschlusses — ein schwaches Modul bremst den gesamten Workflow.
 
 ---
 
