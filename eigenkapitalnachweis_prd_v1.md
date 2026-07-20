@@ -11,22 +11,12 @@
 | Feld | Wert |
 |---|---|
 | Feature | Eigenkapitalnachweis — Bearbeitungs-UI |
-| Version | 1.4 |
+| Version | 1.5 |
 | Status | Draft |
 | Scope | Erfassung der Eigenkapital-Bewegungen je Geschäftsjahr und Abstimmung gegen Zielwerte aus dem Kontenmapping. Editierbare Spalten/Zeilen und zwei Textblöcke. |
 | Abschnitt | Einzelfeature (ein Tab im Jahresabschluss) |
 | Prototyp-Referenz | `github.com/chzurbruegg-PM/aumico-eigenkapitalnachweis` @ `main` HEAD `e69ab8a` (2026-07-14), deployt: `https://aumico-eigenkapitalnachweis.vercel.app` |
 | Delta zu vorherigem Abschnitt | — |
-
-**Änderungshistorie** (neueste zuoberst — Version bei jeder Änderung erhöhen):
-
-| Version | Datum | Änderung |
-|---|---|---|
-| 1.4 | 2026-07-14 | Einleitung/Anmerkung ausserhalb des Nachweis-Containers (Story 4) |
-| 1.3 | 2026-07-14 | Datenmodell-Sektion entfernt, auf 8-Punkte-Standard renummeriert |
-| 1.2 | 2026-07-14 | Auto-Aktualisierung aus der Kontenzuordnung (Story 6, AC-14); OF-3 aufgelöst |
-| 1.1 | 2026-07-14 | Anzeige in vollen CHF mit 2 Nachkommastellen statt TCHF; OF-5 erledigt |
-| 1.0 | 2026-07-14 | Initiale Fassung |
 
 ---
 
